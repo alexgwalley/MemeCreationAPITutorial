@@ -10,10 +10,10 @@ import sys
 
 
 generatorURL = "https://ronreiter-meme-generator.p.rapidapi.com/meme"
+apiKey = "insertRapidAPIKeyHere"
 
 helpMessage = '''Possible functions:
 make: <name> <top-text> <bottom-text> [imagePath]
-add-image: <name> <image-path>
 get-all-meme-names:'''
 
 def toSpongeBob(text):
@@ -26,7 +26,7 @@ def getMeme(meme, topText, bottomText):
 
 	headers = {
 	    'x-rapidapi-host': "ronreiter-meme-generator.p.rapidapi.com",
-	    'x-rapidapi-key': "030a4228c6msh9b3f95f5cae7068p13430ajsn796630acaee6"
+	    'x-rapidapi-key': apiKey
 	}
 
 	random.seed(10)
@@ -68,49 +68,18 @@ def getImageNames():
 
 	headers = {
    		'x-rapidapi-host': "ronreiter-meme-generator.p.rapidapi.com",
-   		'x-rapidapi-key': "030a4228c6msh9b3f95f5cae7068p13430ajsn796630acaee6"
-    }
+   		'x-rapidapi-key': apiKey
+    	}
 
 	response = requests.request("GET", url, headers=headers)
 
 	return response.text
 
-def parseAddImage(argv):
-	url = "https://ronreiter-meme-generator.p.rapidapi.com/images"
-
-	if(len(argv) < 3):
-		print("Usage: add-image <image-path> <name>")
-		sys.exit()
-	if(type(argv[1]) is not str):
-		print("[Error]: Image path must be a string")
-	if(type(argv[2]) is not str):
-		print("[Error]: Image name must be a string")
-
-	imagePath = argv[1]
-	name = argv[2]
-
-	headers = {
-	    'x-rapidapi-host': "ronreiter-meme-generator.p.rapidapi.com",
-	    'x-rapidapi-key': "030a4228c6msh9b3f95f5cae7068p13430ajsn796630acaee6",
-	    'content-type': "multipart/form-data"
-	}
-
-	imageBytes = loadImage(argv[2])
-	#Broken
-	payload = {
-		image:imageBytes
-	}
-
-
-	response = requests.request("POST", url, data=payload, headers=headers)
-
-	print(response.status_code)
-
-
 #parse make meme function
 def parseMakeMeme(argv):
-	imagePath = "response.jpeg"
+	imagePath = "response.jpeg" #default file path
 
+	#Basic error checking
 	if(len(argv) < 5):
 		print("Usage: python3 memeGenerator.py make <name> <top-text> <bottom-text>")
 		sys.exit()
@@ -142,15 +111,13 @@ def main():
 	if(len(sys.argv) < 2):
 		print("Usage: python3 memeGenerator.py <function> [function-arguments]")
 		print("Use \"python3 memeGenerator.py -help\" to see possible options.")
-
-	if(len(sys.argv) > 1 and sys.argv[1].lower() == "-help"):
-		print(helpMessage)
-	if(len(sys.argv) > 1 and sys.argv[1].lower() == "make"):
-		parseMakeMeme(sys.argv)
-	if(len(sys.argv) > 1 and sys.argv[1].lower() == "add-image"):
-		parseAddImage(sys.argv)
-	if(len(sys.argv) > 1 and sys.argv[1].lower() == "get-all-meme-names"):
-		print(getImageNames())
+	if(len(sys.argv) > 1): #This approach would not scale well, but it works for my purposes
+		if(sys.argv[1].lower() == "-help"):
+			print(helpMessage)
+		if(sys.argv[1].lower() == "make"):
+			parseMakeMeme(sys.argv)
+		if(sys.argv[1].lower() == "get-all-meme-names"):
+			print(getImageNames())
 
 if __name__ == "__main__":
 	main()
